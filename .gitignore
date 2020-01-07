@@ -1,0 +1,40 @@
+*.java.hsp
+*.sonarj
+*.sw*
+.DS_Store
+.settings
+.springBeans
+bin
+build.sh
+ivy-cache
+jxl.log
+jmx.log
+derby.log
+.gradle
+argfile*
+pom.xml
+activemq-data/
+
+classes/
+/build
+buildSrc/build
+/fileblade-*/build
+target/
+
+# Eclipse artifacts, including WTP generated manifests
+.classpath
+.project
+fileblade-*/src/main/java/META-INF/MANIFEST.MF
+
+# IDEA artifacts and output dirs
+*.iml
+*.ipr
+*.iws
+.idea
+out
+test-output
+atlassian-ide-plugin.xml
+.gradletasknamecache
+
+# fileblade filesystem
+/fileblade

@@ -1,0 +1,3 @@
+rootProject.name = 'fileblade-spring'
+include 'fileblade-server'
+

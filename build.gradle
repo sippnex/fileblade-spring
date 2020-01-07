@@ -1,0 +1,136 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.2.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+
+dependencies {
+    compile project(':fileblade-server')
+}
+
+allprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+    apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
+subprojects { subProject ->
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java-library'
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.2.2.RELEASE")
+        }
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    group 'com.sippnex'
+    version findProperty('projectVersion') ?: '0.0.1-SNAPSHOT'
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    signing {
+
+        def signingKey = findProperty('gpgPrivateKey') ?: System.getenv('gpg_private_key')
+        def signingPassword = findProperty('gpgPassphrase') ?: System.getenv('gpg_passphrase')
+
+        useInMemoryPgpKeys(signingKey as String, signingPassword as String)
+
+        sign configurations.archives
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+
+                def username = findProperty('sonatypeUsername') ?: System.getenv('sonatype_username')
+                def password = findProperty('sonatypePassword') ?: System.getenv('sonatype_password')
+
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: username, password: password)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: username, password: password)
+                }
+
+                pom.project {
+                    name 'Fileblade Spring Server'
+                    description 'Server-side Spring library for fileblade. A web filemanager'
+                    packaging 'jar'
+                    artifactId subProject.name
+                    version subProject.version
+                    url 'https://github.com/sippnex/fileblade-spring'
+
+                    organization {
+                        name 'Sippnex'
+                        url 'https://www.sippnex.com/'
+                    }
+
+                    issueManagement {
+                        system 'GitHub'
+                        url 'https://github.com/sippnex/fileblade-spring/issues'
+                    }
+
+                    licenses {
+                        license {
+                            name 'Apache License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+
+                    scm {
+                        url 'https://github.com/sippnex/fileblade-spring'
+                        connection 'scm:git:git://github.com/sippnex/fileblade-spring.git'
+                        developerConnection 'scm:git:ssh://git@github.com:sippnex/fileblade-spring.git'
+                    }
+
+                    developers {
+                        developer {
+                            name 'sippnex'
+                            email 'julian.sobotka@gmail.com'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
