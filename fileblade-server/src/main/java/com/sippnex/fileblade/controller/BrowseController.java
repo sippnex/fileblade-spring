@@ -37,4 +37,10 @@ public class BrowseController {
         filebladeService.moveElement(pathString, target);
     }
 
+    @DeleteMapping("**")
+    public void deleteElement(HttpServletRequest request) throws IOException {
+        String pathString = PathUtils.getPathFromRequest(request);
+        filebladeService.deleteElement(pathString);
+    }
+
 }

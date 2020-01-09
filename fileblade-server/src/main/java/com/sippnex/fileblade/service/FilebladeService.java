@@ -6,8 +6,10 @@ import com.sippnex.fileblade.domain.FbFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -69,6 +71,14 @@ public class FilebladeService {
         Path sourcePath = Paths.get(rootPath + sourcePathString);
         Path targetPath = Paths.get(rootPath + targetPathString);
         Files.move(sourcePath, targetPath);
+    }
+
+    public void deleteElement(String pathString) throws IOException {
+        Path path = Paths.get(rootPath + pathString);
+        Files.walk(path)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
     }
 
 }
